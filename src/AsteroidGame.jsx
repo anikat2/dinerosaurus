@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import dino from "/Users/rakshanadevalla/dinerosaur/src/assets/dinosaur-cartoon-dinosaur-cute-dinosaur-dinosaur-clipart-cat-dog-meter-snout-png-clipart-removebg-preview.png";
 import asteroid from "/Users/rakshanadevalla/dinerosaur/src/assets/pngtree-asteroid-icon-flat-style-png-image_1977257-removebg-preview.png";
+import hat from "/Users/rakshanadevalla/dinerosaur/src/assets/halloweenhatpowerup.png"; 
 
 function AsteroidGame() {
   const containerRef = useRef(null);
@@ -9,6 +10,7 @@ function AsteroidGame() {
   const dinoHeight = 150;
   const asteroidWidth = 120;
   const asteroidHeight = 120;
+  const [hatPowerUp, setHatPowerUp] = useState(false);
 
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [gameOver, setGameOver] = useState(false);
@@ -58,16 +60,33 @@ function AsteroidGame() {
         }}
       >
         {/* Dinosaur */}
-        <img
-          src={dino}
-          alt="dino"
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            width: `${dinoWidth}px`
-          }}
-        />
+          <img
+            src={dino}
+            alt="dino"
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              width: `${dinoWidth}px`
+            }}
+          />
+
+          {/* Hat (conditionally rendered) */}
+          {hatPowerUp && (
+            <img
+              src={hat}
+              alt="hat"
+              style={{
+                position: "absolute",
+                bottom: dinoHeight-65, // adjust to position on dino head
+                left: 70,                // adjust to center over dino
+                width: "50px",
+                zIndex: 2
+              }}
+            />
+          )}
+
+        
 
         {/* Asteroid */}
         {!gameOver && (
@@ -114,7 +133,14 @@ function AsteroidGame() {
       >
         Move Asteroid Diagonally
       </button>
+
+      <button onClick={() => setHatPowerUp(!hatPowerUp)}>
+        Toggle Hat Power-Up
+      </button>
+
     </div>
+
+    
   );
 }
 
