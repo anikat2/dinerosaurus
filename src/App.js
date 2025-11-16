@@ -1,46 +1,46 @@
-import TempEr from "./TempEr";
-
-import { useState } from 'react';
+import React, { useState } from "react";
 import './App.css';
-import PowerUpsBack from './PowerUpsBack';
-import Portfolio from './Portfolio';
-import Spending from './Spending';
 import Navbar from "./Navbar";
-import AsteroidGame from './AsteroidGame';
-
-
+import TempEr from "./TempEr";
+import AsteroidGame from "./AsteroidGame";
+import Spending from "./Spending";
 
 function App() {
   const [page, setPage] = useState("home");
 
   // Shared state
-  const [balance, setBalance] = useState(5);
+  const [balance, setBalance] = useState(50);
   const [accessorizeClicked, setAccessorizeClicked] = useState(false);
   const [dragClicked, setDragClicked] = useState(false);
   const [icicleClicked, setIcicleClicked] = useState(false);
   const [timeTravelClicked, setTimeTravelClicked] = useState(false);
 
+  const [latestPercentChange, setLatestPercentChange] = useState(0);
+
   return (
     <div className="App">
-    <Navbar setPage={setPage} />
+      <Navbar setPage={setPage} />
 
       {page === "home" && (
         <>
-      
+          <TempEr
+            currentBalance={balance}
+            setCurrentBalance={setBalance}
+            onPercentChange={setLatestPercentChange}
+          />
 
-<AsteroidGame
-        hatPowerUp={accessorizeClicked}
-        dragPowerUp={dragClicked}
-        iciclePowerUp={icicleClicked}
-        resetDrag={() => setDragClicked(false)}
-        resetIcicle={() => setIcicleClicked(false)}
-      />
-
-
-
+          <AsteroidGame
+            balance={balance}
+            setBalance={setBalance}
+            latestPercentChange={latestPercentChange}
+            hatPowerUp={accessorizeClicked}
+            dragPowerUp={dragClicked}
+            iciclePowerUp={icicleClicked}
+            resetDrag={() => setDragClicked(false)}
+            resetIcicle={() => setIcicleClicked(false)}
+          />
         </>
       )}
-
 
       {page === "spending" && (
         <Spending
@@ -57,7 +57,6 @@ function App() {
           setTimeTravelClicked={setTimeTravelClicked}
         />
       )}
-      
     </div>
   );
 }

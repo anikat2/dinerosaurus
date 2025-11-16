@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import PowerUpsBack from "./PowerUpsBack";
+import PowerUpsBack from "./PowersUpsBack";
 import AsteroidGame from "./AsteroidGame";
 import TempEr from "./TempEr";
 

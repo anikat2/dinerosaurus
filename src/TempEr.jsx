@@ -21,16 +21,14 @@ ChartJS.register(
   Legend
 );
 
-export default function TempEr({ onPercentChange }) {
+export default function TempEr({ currentBalance, setCurrentBalance, onPercentChange }) {
   const [portfolioData, setPortfolioData] = useState([]);
-  const [currentBalance, setCurrentBalance] = useState(0);
   const [latestPercentChange, setLatestPercentChange] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const handleNextDay = async () => {
     setLoading(true);
 
-    // Add placeholder day
     setPortfolioData(prev => [
       ...prev,
       { date: `Day ${prev.length + 1}`, percentChange: latestPercentChange }
@@ -61,10 +59,9 @@ export default function TempEr({ onPercentChange }) {
           return updated;
         });
 
-        setCurrentBalance(totalBalance);
+        setCurrentBalance(totalBalance); // 🔥 Update shared balance
         setLatestPercentChange(totalPercent);
 
-        // Notify parent / game
         onPercentChange(totalPercent);
       }
     } catch (err) {
@@ -95,12 +92,7 @@ export default function TempEr({ onPercentChange }) {
               }
             ]
           }}
-          options={{
-            responsive: true,
-            scales: {
-              y: { beginAtZero: true }
-            }
-          }}
+          options={{ responsive: true, scales: { y: { beginAtZero: true } } }}
         />
       </div>
 
@@ -112,17 +104,12 @@ export default function TempEr({ onPercentChange }) {
         {loading ? "..." : "Next Day"}
       </button>
 
-      {/* TEST BUTTON */}
       <button
         onClick={() => {
           setLatestPercentChange(-5);
           onPercentChange(-5);
         }}
-        style={{
-          marginLeft: "20px",
-          padding: "12px 20px",
-          fontSize: "20px"
-        }}
+        style={{ marginLeft: "20px", padding: "12px 20px", fontSize: "20px" }}
       >
         Test -5%
       </button>

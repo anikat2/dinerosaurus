@@ -2,10 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import earth from "./assets/earth.png";
 import dino from "./assets/dino.png";
 import asteroidImg from "./assets/asteroid.png";
+import hat from "/Users/rakshanadevalla/dinerosaur/src/assets/halloweenhatpowerup.png";
 import "./AsteroidGame.css";
-import TempEr from "./TempEr";
 
 export default function AsteroidGame({
+  balance,              // shared balance
+  setBalance,           // update balance
+  latestPercentChange,  // portfolio percent change from TempEr
   hatPowerUp,
   dragPowerUp,
   iciclePowerUp,
@@ -13,37 +16,26 @@ export default function AsteroidGame({
   resetIcicle,
 }) {
   const containerRef = useRef(null);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [gameOver, setGameOver] = useState(false);
 
   const dinoWidth = 300;
   const dinoHeight = 300;
   const asteroidWidth = 200;
   const asteroidHeight = 200;
 
-  const [position, setPosition] = useState({ top: 0, left: 0 });
-
-  // Set initial asteroid position
+  // Set initial asteroid position (top-right corner)
   useEffect(() => {
     if (containerRef.current) {
       const containerWidth = containerRef.current.offsetWidth;
-      setPosition({
-        top: 0,
-        left: containerWidth - asteroidWidth
-      });
+      setPosition({ top: 0, left: containerWidth - asteroidWidth });
     }
   }, []);
-    const [gameOver, setGameOver] = useState(false);
 
-  // Initial asteroid position (top-right corner)
-useEffect(() => {
-  if (containerRef.current) {
-    const containerWidth = containerRef.current.offsetWidth;
-    setPosition({
-      top: 0,                                 // top of game area
-      left: containerWidth - asteroidWidth    // right edge
-    });
-  }
-}, []);
-
+  // Move asteroid whenever portfolio percent change is negative
+  useEffect(() => {
+    if (latestPercentChange < 0) moveAsteroid();
+  }, [latestPercentChange]);
 
   const moveAsteroid = () => {
     if (gameOver) return;
@@ -64,19 +56,13 @@ useEffect(() => {
       const newLeft = Math.max(prev.left - horizontalStep, 0);
 
       const container = containerRef.current;
-      const containerWidth = container.offsetWidth;
-      const containerHeight = container.offsetHeight;
+      const dinoX = container.offsetWidth / 2 - dinoWidth / 2;
+      const dinoY = container.offsetHeight - dinoHeight;
 
-      // Dino position
-      const dinoX = containerWidth / 2 - dinoWidth / 2;
-      const dinoY = containerHeight - dinoHeight;
-
-      // Asteroid position
       const asteroidX = newLeft;
       const asteroidY = newTop;
 
       const hitboxOffset = -10;
-
       const isCollision =
         asteroidX < dinoX + dinoWidth - hitboxOffset &&
         asteroidX + asteroidWidth > dinoX + hitboxOffset &&
@@ -93,31 +79,37 @@ useEffect(() => {
 
   return (
     <div className="asteroid-layout">
-      {/* Top Bar with Chart */}
-      <div className="asteroid-top-bar">
-        <TempEr
-          onPercentChange={(percent) => {
-            if (percent < 0) moveAsteroid(); // 🚀 Now works correctly
-          }}
-        />
-      </div>
-
       {/* Game Area */}
       <div ref={containerRef} className="asteroid-container">
-        <div className="earth-dino-wrapper">
-          <img src={earth} alt="earth" className="earth" />
-          <img src={dino} alt="dino" className="dino" />
-        </div>
+      <div className="earth-dino-wrapper">
+  <img src={earth} alt="earth" className="earth" />
+  <img src={dino} alt="dino" className="dino" />
+  {hatPowerUp && (
+    <img
+      src={hat}
+      alt="Hat Power-Up"
+      style={{
+        position: "absolute",
+        bottom: dinoHeight - 65,
+        left: 70,
+        width: "50px",
+        zIndex: 2
+      }}
+    />
+  )}
+</div>
+
+    
+
+
+        
 
         {!gameOver && (
           <img
             src={asteroidImg}
             alt="asteroid"
             className="asteroid"
-            style={{
-              top: `${position.top}px`,
-              left: `${position.left}px`,
-            }}
+            style={{ top: `${position.top}px`, left: `${position.left}px` }}
           />
         )}
 
@@ -126,13 +118,15 @@ useEffect(() => {
         )}
       </div>
 
-      {/* Test button */}
-      <button
-        style={{ marginTop: "20px" }}
-        onClick={() => moveAsteroid()}
-      >
+      {/* Debug/Test button */}
+      <button style={{ marginTop: "20px" }} onClick={moveAsteroid}>
         Test Move Asteroid
       </button>
+
+      {/* Optional: Show balance */}
+      <div style={{ marginTop: "10px" }}>
+        Balance: ${balance.toFixed(2)}
+      </div>
     </div>
   );
 }
