@@ -10,7 +10,7 @@ function App() {
   const [page, setPage] = useState("home");
 
   // Shared state
-  const [balance, setBalance] = useState(1000.00);
+  const [balance, setBalance] = useState();
   const [accessorizeClicked, setAccessorizeClicked] = useState(false);
   const [dragClicked, setDragClicked] = useState(false);
   const [icicleClicked, setIcicleClicked] = useState(false);
@@ -25,14 +25,14 @@ function App() {
       {page === "home" && (
         <>
           <TempEr
-            currentBalance={balance}
-            setCurrentBalance={setBalance}
+            currentBalance={balance} // full object
+            setCurrentBalance={setBalance} // full object
             onPercentChange={setLatestPercentChange}
           />
 
           <AsteroidGame
-            balance={balance}
-            setBalance={setBalance}
+            balance={balance} // full object
+            setBalance={setBalance} // full object
             latestPercentChange={latestPercentChange}
             hatPowerUp={accessorizeClicked}
             dragPowerUp={dragClicked}

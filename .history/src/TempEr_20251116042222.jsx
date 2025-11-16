@@ -73,7 +73,7 @@ export default function TempEr({ currentBalance, setCurrentBalance, onPercentCha
   return (
     <div style={{ textAlign: "center", padding: "40px" }}>
       <h1>
-        ${currentBalance.toFixed(2)}{" "}
+        ${currentBalance}{" "}
         {latestPercentChange > 0 ? "▲" : latestPercentChange < 0 ? "▼" : ""}
       </h1>
 

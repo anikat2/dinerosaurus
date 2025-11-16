@@ -58,7 +58,7 @@ export default function TempEr({ currentBalance, setCurrentBalance, onPercentCha
 
         // ✅ Correctly fetch and set shared balance
         const newBalance = await getBalance();
-        setCurrentBalance(newBalance);  // full object
+        setCurrentBalance(newBalance["total_account_value"] || 0);
 
         setLatestPercentChange(totalPercent);
         onPercentChange(totalPercent);

@@ -31,14 +31,19 @@ export default function AsteroidGame({
     const fetchBalance = async () => {
       try {
         const data = await getBalance();
+        
+        // Always update with the latest data from the API
         setBalanceData(data);
+        setBalance(data); // full object
       } catch (error) {
         console.error("Error fetching balance:", error);
+        // Retry on error
+        setTimeout(fetchBalance, 2000);
       }
     };
 
     fetchBalance();
-    const interval = setInterval(fetchBalance, 5000); // Refresh every 5 seconds
+    const interval = setInterval(fetchBalance, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -96,6 +101,15 @@ export default function AsteroidGame({
     });
   };
 
+  const handleRefreshBalance = async () => {
+    try {
+      const data = await getBalance();
+      setBalanceData(data);
+    } catch (error) {
+      console.error("Error refreshing balance:", error);
+    }
+  };
+
   return (
     <div className="asteroid-layout">
       {/* Game Area */}
@@ -132,27 +146,16 @@ export default function AsteroidGame({
         )}
       </div>
 
-      {/* Debug/Test button */}
-      <button style={{ marginTop: "20px" }} onClick={moveAsteroid}>
-        Test Move Asteroid
-      </button>
-
-      {/* Display balance information from /balance endpoint */}
-      <div style={{ marginTop: "10px", fontSize: "14px", lineHeight: "1.8" }}>
-        {balanceData ? (
-          <>
-            <div><strong>Cash Balance:</strong> ${balanceData.cash_balance?.toFixed(2) || "0.00"}</div>
-            <div><strong>Portfolio Value:</strong> ${balanceData.portfolio_value?.toFixed(2) || "0.00"}</div>
-            <div><strong>Total Account Value:</strong> ${balanceData.total_account_value?.toFixed(2) || "0.00"}</div>
-            <div style={{ color: balanceData.total_gain_loss >= 0 ? "green" : "red" }}>
-              <strong>Total Gain/Loss:</strong> ${balanceData.total_gain_loss?.toFixed(2) || "0.00"} 
-              ({balanceData.total_gain_loss >= 0 ? "+" : ""}{((balanceData.total_gain_loss / balanceData.starting_balance) * 100).toFixed(2)}%)
-            </div>
-          </>
-        ) : (
-          <div>Loading balance...</div>
-        )}
+      {/* Debug/Test buttons */}
+      <div style={{ marginTop: "20px" }}>
+        <button onClick={moveAsteroid}>
+          Test Move Asteroid
+        </button>
+        <button style={{ marginLeft: "10px" }} onClick={handleRefreshBalance}>
+          Refresh Balance
+        </button>
       </div>
+
     </div>
   );
 }

@@ -19,11 +19,34 @@ export default function AsteroidGame({
   const containerRef = useRef(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [gameOver, setGameOver] = useState(false);
+  const [balanceData, setBalanceData] = useState(null);
 
   const dinoWidth = 300;
   const dinoHeight = 300;
   const asteroidWidth = 200;
   const asteroidHeight = 200;
+
+  // Fetch balance data on mount and periodically
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const data = await getBalance();
+        
+        // Always update with the latest data from the API
+        setBalanceData(data);
+        setBalance(data.cash_balance);
+      } catch (error) {
+        console.error("Error fetching balance:", error);
+        // Retry on error
+        setTimeout(fetchBalance, 2000);
+      }
+    };
+
+    fetchBalance();
+    const interval = setInterval(fetchBalance, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Set initial asteroid position (top-right corner)
   useEffect(() => {
@@ -78,6 +101,15 @@ export default function AsteroidGame({
     });
   };
 
+  const handleRefreshBalance = async () => {
+    try {
+      const data = await getBalance();
+      setBalanceData(data);
+    } catch (error) {
+      console.error("Error refreshing balance:", error);
+    }
+  };
+
   return (
     <div className="asteroid-layout">
       {/* Game Area */}
@@ -114,15 +146,16 @@ export default function AsteroidGame({
         )}
       </div>
 
-      {/* Debug/Test button */}
-      <button style={{ marginTop: "20px" }} onClick={moveAsteroid}>
-        Test Move Asteroid
-      </button>
-
-      {/* Display shared balance */}
-      <div style={{ marginTop: "10px" }}>
-        Balance: {balance.toFixed(2)}
+      {/* Debug/Test buttons */}
+      <div style={{ marginTop: "20px" }}>
+        <button onClick={moveAsteroid}>
+          Test Move Asteroid
+        </button>
+        <button style={{ marginLeft: "10px" }} onClick={handleRefreshBalance}>
+          Refresh Balance
+        </button>
       </div>
+
     </div>
   );
 }

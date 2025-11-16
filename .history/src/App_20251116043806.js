@@ -4,12 +4,13 @@ import Navbar from "./Navbar";
 import TempEr from "./TempEr";
 import AsteroidGame from "./AsteroidGame";
 import Spending from "./Spending";
+import Investing from "./Investing";
 
 function App() {
   const [page, setPage] = useState("home");
 
   // Shared state
-  const [balance, setBalance] = useState(50);
+  const [balance, setBalance] = useState();
   const [accessorizeClicked, setAccessorizeClicked] = useState(false);
   const [dragClicked, setDragClicked] = useState(false);
   const [icicleClicked, setIcicleClicked] = useState(false);
@@ -24,7 +25,7 @@ function App() {
       {page === "home" && (
         <>
           <TempEr
-            currentBalance={balance}
+            currentBalance={balance?.total_account_value || 0}  // pass number, not object
             setCurrentBalance={setBalance}
             onPercentChange={setLatestPercentChange}
           />
@@ -57,6 +58,22 @@ function App() {
           setTimeTravelClicked={setTimeTravelClicked}
         />
       )}
+      {page === "portfolio" && (
+        <Investing
+          setPage={setPage}
+          balance={balance}
+          setBalance={setBalance}
+          accessorizeClicked={accessorizeClicked}
+          setAccessorizeClicked={setAccessorizeClicked}
+          dragClicked={dragClicked}
+          setDragClicked={setDragClicked}
+          icicleClicked={icicleClicked}
+          setIcicleClicked={setIcicleClicked}
+          timeTravelClicked={timeTravelClicked}
+          setTimeTravelClicked={setTimeTravelClicked}
+        />
+      )}
+
     </div>
   );
 }

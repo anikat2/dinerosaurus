@@ -10,7 +10,7 @@ function App() {
   const [page, setPage] = useState("home");
 
   // Shared state
-  const [balance, setBalance] = useState(50);
+  const [balance, setBalance] = useState();
   const [accessorizeClicked, setAccessorizeClicked] = useState(false);
   const [dragClicked, setDragClicked] = useState(false);
   const [icicleClicked, setIcicleClicked] = useState(false);

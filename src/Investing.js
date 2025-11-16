@@ -12,7 +12,7 @@ function Investing() {
   const [priceOrShares, setPriceOrShares] = useState("");
   const [stockInput, setStockInput] = useState("");
   const [amount, setAmount] = useState("");
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -25,7 +25,7 @@ function Investing() {
         setTickers(stocksData.stocks || {});
 
         const bal = await getBalance();
-        setBalance(bal.total_balance || 0);
+        setBalance(bal); // Store the full balance object
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -35,12 +35,12 @@ function Investing() {
     fetchData();
   }, []);
 
-    const handleNextDay = async () => {
+  const handleNextDay = async () => {
     try {
-        // Call the FastAPI next_day endpoint
-        const data = await nextDay(); // <-- We need to rename the import to avoid conflict
+      // Call the FastAPI next_day endpoint
+      const data = await nextDay();
 
-        if (data.status === "success") {
+      if (data.status === "success") {
         // Update tickers table
         const stocksData = await getTopStocks();
         setTickers(stocksData.stocks || {});
@@ -52,15 +52,14 @@ function Investing() {
 
         // Update balance
         const bal = await getBalance();
-        setBalance(bal || 0);
-        } else {
+        setBalance(bal);
+      } else {
         alert(data.message || "No more days available");
-        }
+      }
     } catch (err) {
-        console.error("Error advancing to next day:", err);
+      console.error("Error advancing to next day:", err);
     }
-    };
-
+  };
 
   const handleExecute = async () => {
     if (!stockInput || !amount || !buyOrSell) {
@@ -94,7 +93,7 @@ function Investing() {
       }
 
       const bal = await getBalance();
-      setBalance(bal || 0);
+      setBalance(bal);
     } catch (err) {
       console.error("Error executing transaction:", err);
     }
@@ -103,6 +102,11 @@ function Investing() {
   if (loading) {
     return <p>Loading top news...</p>;
   }
+
+  // Get display values from balance object
+  const cashBalance = balance?.cash_balance || 0;
+  const totalAccountValue = balance?.total_account_value || 0;
+  const portfolioValue = balance?.portfolio_value || 0;
 
   return (
     <div>
@@ -224,8 +228,16 @@ function Investing() {
           </div>
 
           <button onClick={handleExecute} style={{ padding: "6px 12px" }}>Execute</button>
-          <h2>Balance: ${balance}</h2>
-          <button onClick={handleNextDay}> next day</button>
+          
+          {/* Display balance information */}
+          <div style={{ marginTop: "10px" }}>
+            <h3>Account Summary</h3>
+            <p><strong>Cash Balance:</strong> ${cashBalance.toFixed(2)}</p>
+            <p><strong>Portfolio Value:</strong> ${portfolioValue.toFixed(2)}</p>
+            <p><strong>Total Account Value:</strong> ${totalAccountValue.toFixed(2)}</p>
+          </div>
+          
+          <button onClick={handleNextDay} style={{ marginTop: "10px" }}>Next Day</button>
         </div>
       </div>
     </div>

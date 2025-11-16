@@ -10,7 +10,7 @@ function App() {
   const [page, setPage] = useState("home");
 
   // Shared state
-  const [balance, setBalance] = useState(1000.00);
+  const [balance, setBalance] = useState();
   const [accessorizeClicked, setAccessorizeClicked] = useState(false);
   const [dragClicked, setDragClicked] = useState(false);
   const [icicleClicked, setIcicleClicked] = useState(false);
@@ -25,7 +25,7 @@ function App() {
       {page === "home" && (
         <>
           <TempEr
-            currentBalance={balance}
+            currentBalance={balance?.total_account_value || 0}  // pass number, not object
             setCurrentBalance={setBalance}
             onPercentChange={setLatestPercentChange}
           />

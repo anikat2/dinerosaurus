@@ -31,12 +31,10 @@ export default function AsteroidGame({
     const fetchBalance = async () => {
       try {
         const data = await getBalance();
-        console.log("Balance data received:", data);
-        console.log("Cash balance:", data?.cash_balance);
-        console.log("Total account value:", data?.total_account_value);
         
         // Always update with the latest data from the API
         setBalanceData(data);
+        setBalance(data); // full object
       } catch (error) {
         console.error("Error fetching balance:", error);
         // Retry on error
@@ -158,26 +156,6 @@ export default function AsteroidGame({
         </button>
       </div>
 
-      {/* Display balance information from /balance endpoint */}
-      <div style={{ marginTop: "10px", fontSize: "14px", lineHeight: "1.8" }}>
-        {balanceData ? (
-          <>
-            <div style={{ background: "#f0f0f0", padding: "5px", marginBottom: "10px", fontSize: "11px" }}>
-              DEBUG: {JSON.stringify(balanceData)}
-            </div>
-            <div><strong>Cash Balance:</strong> ${balanceData.cash_balance?.toFixed(2) || "0.00"}</div>
-            <div><strong>Portfolio Value:</strong> ${balanceData.portfolio_value?.toFixed(2) || "0.00"}</div>
-            <div><strong>Total Account Value:</strong> ${balanceData.total_account_value?.toFixed(2) || "0.00"}</div>
-            <div style={{ color: balanceData.total_gain_loss >= 0 ? "green" : "red" }}>
-              <strong>Total Gain/Loss:</strong> ${balanceData.total_gain_loss?.toFixed(2) || "0.00"} 
-              ({balanceData.total_gain_loss >= 0 ? "+" : ""}
-              {balanceData.starting_balance > 0 ? ((balanceData.total_gain_loss / balanceData.starting_balance) * 100).toFixed(2) : "0.00"}%)
-            </div>
-          </>
-        ) : (
-          <div>Loading balance... (waiting for backend to initialize)</div>
-        )}
-      </div>
     </div>
   );
 }
