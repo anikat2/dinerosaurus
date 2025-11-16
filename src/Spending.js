@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
-import calculatorImg from "./assets/calculator.png";
-import powerupsImg from "./assets/powerups.png";
 import "./Spending.css";
 import { delAmt, getBalance } from "./api/getInfo";
 
-function Spending({
+function Spending({ 
   setPage,
   balance,
   setBalance,
@@ -17,6 +15,7 @@ function Spending({
   timeTravelClicked,
   setTimeTravelClicked
 }) {
+
   const [input, setInput] = useState("");
 
   // Fetch balance on mount
@@ -36,112 +35,111 @@ function Spending({
   // Get current cash balance from balance object
   const currentBalance = balance?.cash_balance || 0;
 
-  const handleClick = (value) => {
-    if (value === "C") {
-      setInput("");
-    } else if (value === "=") {
-      try {
-        const result = eval(input); // simple demo
-        setInput(result);
-        // Note: This calculator updates local input but doesn't affect actual balance
-      } catch {
-        setInput("Error");
-      }
-    } else {
-      setInput(input + value);
+  const buy = (cost, action) => {
+    if (balance >= cost) {
+      setBalance((prev) => prev - cost);
+      action();
     }
   };
 
-  const handlePowerUpPurchase = async (cost, setPowerUp, powerUpName) => {
-    if (currentBalance >= cost) {
-      try {
-        const result = await delAmt(cost);
-        
-        if (result.status === "success") {
-          setPowerUp(true);
-          const newBalance = await getBalance();
-          setBalance(newBalance);
-          alert(`${powerUpName} purchased for $${cost}!`);
-        } else {
-          alert(result.message || "Purchase failed");
-        }
-      } catch (error) {
-        console.error("Error purchasing power-up:", error);
-        alert("Failed to purchase power-up");
-      }
-    } else {
-      alert(`Insufficient balance! You need $${cost} but only have $${currentBalance.toFixed(2)}`);
+  const accessorize = () => {
+    if (balance >= 20) {
+      setBalance(prev => prev - 20);
+      setAccessorizeClicked(true);
+    }
+  };
+
+  const drag = () => {
+    if(balance >= 150) {
+      setBalance(prev => prev - 150);
+      setDragClicked(true);
+    }
+  };
+
+  const icicle = () => {
+    if(balance >= 300) {
+      setBalance(prev => prev - 300);
+      setIcicleClicked(true);
+    }
+  };
+
+  const timetravel = () => {
+    if(balance >= 1000) {
+      setBalance(prev => prev - 1000);
+      setTimeTravelClicked(true);
     }
   };
 
   return (
-    <div className="spending-page-wrapper">
-      <h1 className="spending-title">Spending / Power-Ups Page</h1>
+    <div className="spending-wrapper">
+      <h1 className="spending-title">Spending / Power-Ups</h1>
 
-      <button 
-        onClick={() => setPage("home")}
-        style={{ marginBottom: "20px", padding: "10px 20px", fontSize: "16px" }}
-      >
-        Back to Home
-      </button>
+      <br></br>
+      <br></br>
+      <br></br>
 
-      <div className="spending-page" style={{ display: "flex", gap: "50px" }}>
+      <div className="balance-box">
+        Balance: ${balance}
+      </div>
+
+      <div className="cards">
         
-        {/* Calculator */}
-        <div className="calculator-container">
-          <img src={calculatorImg} alt="Calculator" className="calculator-img" />
-          <div className="calculator-display">
-            <div>{input || "0"}</div>
-          </div>
-
-          {["1","2","3","+","4","5","6","-","7","8","9","*","0",".","=","/","C"].map((btn, i) => (
-            <button
-              key={i}
-              className="calc-btn"
-              onClick={() => handleClick(btn)}
-            >
-              {btn}
-            </button>
-          ))}
-        </div>
-
-        {/* Power-ups */}
-        <div className="powerups-container">
-          <img src={powerupsImg} alt="Powerups" className="powerups-img" />
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "20px" }}>
-            <div style={{ marginBottom: "10px", fontWeight: "bold" }}>
-              Cash Balance: ${currentBalance.toFixed(2)}
-            </div>
-            
-            <button 
-              onClick={() => handlePowerUpPurchase(20, setAccessorizeClicked, "Accessorize")}
-              disabled={currentBalance < 20 || accessorizeClicked}
-            >
-              Accessorize - $20 {accessorizeClicked ? "✅" : "❌"}
-            </button>
-            
-            <button 
-              onClick={() => handlePowerUpPurchase(150, setDragClicked, "Drag Power")}
-              disabled={currentBalance < 150 || dragClicked}
-            >
-              Drag Power - $150 {dragClicked ? "✅" : "❌"}
-            </button>
-            
-            <button 
-              onClick={() => handlePowerUpPurchase(20, setIcicleClicked, "Icicle Power")}
-              disabled={currentBalance < 20 || icicleClicked}
-            >
-              Icicle Power - $20 {icicleClicked ? "✅" : "❌"}
-            </button>
-            
-            <button 
-              onClick={() => handlePowerUpPurchase(20, setTimeTravelClicked, "Time Travel")}
-              disabled={currentBalance < 20 || timeTravelClicked}
-            >
-              Time Travel - $20 {timeTravelClicked ? "✅" : "❌"}
-            </button>
+        {/* Accessorize */}
+        <div className="card">
+          <div className="title">🎀 accessorize</div>
+          <div className="subtitle">add a cute hat accessory!</div>
+          <div className="buttons">
+            <button className="price">$20</button>
+            <button className="purchase"
+              onClick={accessorize}
+              disabled={accessorizeClicked || balance < 20}>purchase</button>
           </div>
         </div>
+
+        {/* Drag */}
+        <div className="card">
+          <div className="title">🐢 drag</div>
+          <div className="subtitle">slow down asteroid x2 for one day</div>
+          <div className="buttons">
+            <button className="price">$150</button>
+            <button className="purchase"
+              onClick={drag}
+              disabled={balance < 150}>purchase</button>
+          </div>
+        </div>
+
+        {/* Icicle */}
+        <div className="card">
+          <div className="title">🧊 icicle</div>
+          <div className="subtitle">freeze the asteroid for 1 day</div>
+          <div className="buttons">
+            <button className="price">$300</button>
+            <button className="purchase"
+              onClick={icicle}
+              disabled={balance < 300}>purchase</button>
+          </div>
+        </div>
+
+        {/* Time Travel */}
+        <div className="card">
+          <div className="title">⏰ time travel</div>
+          <div className="subtitle">see predictive models to aid investment decisions</div>
+          <div className="buttons">
+            <button className="price">$1000</button>
+            <button className="purchase" 
+              onClick={timetravel}
+              disabled={balance < 1000}>purchase</button>
+          </div>
+          <br />
+          <p>Ticker:
+          <input
+            type="text"
+            className="tt-input"
+            style={{ marginLeft: "10px" }}
+            placeholder="enter something..."
+          /></p>
+        </div>
+
       </div>
     </div>
   );
