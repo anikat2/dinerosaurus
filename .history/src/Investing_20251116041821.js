@@ -229,6 +229,7 @@ function Investing() {
 
           <button onClick={handleExecute} style={{ padding: "6px 12px" }}>Execute</button>
           
+          {/* Display balance information */}
           <div style={{ marginTop: "10px" }}>
             <h3>Account Summary</h3>
             <p><strong>Cash Balance:</strong> ${cashBalance.toFixed(2)}</p>
@@ -236,6 +237,7 @@ function Investing() {
             <p><strong>Total Account Value:</strong> ${totalAccountValue.toFixed(2)}</p>
           </div>
           
+          <button onClick={handleNextDay} style={{ marginTop: "10px" }}>Next Day</button>
         </div>
       </div>
     </div>

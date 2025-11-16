@@ -46,7 +46,7 @@ export async function delAmt(val) {
   return await res.json();
 }
 
-export async function getPortfolio() {
+export async function getPortfolio {
     const response = await fetch("http://localhost:8000/balance");
     return await response.json();
 }

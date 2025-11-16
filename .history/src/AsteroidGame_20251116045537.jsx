@@ -4,7 +4,7 @@ import dino from "./assets/dino.png";
 import asteroidImg from "./assets/asteroid.png";
 import hat from "./assets/halloweenhatpowerup.png";
 import "./AsteroidGame.css";
-import { getBalance } from "./api/getInfo";
+import { getBalance, getPortfolio } from "./api/getInfo";
 
 export default function AsteroidGame({
   balance,              // shared balance
@@ -101,14 +101,6 @@ export default function AsteroidGame({
     });
   };
 
-  const handleRefreshBalance = async () => {
-    try {
-      const data = await getBalance();
-      setBalanceData(data);
-    } catch (error) {
-      console.error("Error refreshing balance:", error);
-    }
-  };
 
   return (
     <div className="asteroid-layout">
@@ -145,17 +137,7 @@ export default function AsteroidGame({
           <div className="asteroid-game-over">💥 Game Over! 💥</div>
         )}
       </div>
-
-      {/* Debug/Test buttons */}
-      <div style={{ marginTop: "20px" }}>
-        <button onClick={moveAsteroid}>
-          Test Move Asteroid
-        </button>
-        <button style={{ marginLeft: "10px" }} onClick={handleRefreshBalance}>
-          Refresh Balance
-        </button>
-      </div>
-
+        {getPortfolio}
     </div>
   );
 }

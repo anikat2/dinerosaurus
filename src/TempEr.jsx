@@ -104,15 +104,6 @@ export default function TempEr({ currentBalance, setCurrentBalance, onPercentCha
         {loading ? "..." : "Next Day"}
       </button>
 
-      <button
-        onClick={() => {
-          setLatestPercentChange(-5);
-          onPercentChange(-5);
-        }}
-        style={{ marginLeft: "20px", padding: "12px 20px", fontSize: "20px" }}
-      >
-        Test -5%
-      </button>
     </div>
   );
 }

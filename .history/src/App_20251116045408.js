@@ -5,7 +5,6 @@ import TempEr from "./TempEr";
 import AsteroidGame from "./AsteroidGame";
 import Spending from "./Spending";
 import Investing from "./Investing";
-
 function App() {
   const [page, setPage] = useState("home");
 
@@ -25,14 +24,14 @@ function App() {
       {page === "home" && (
         <>
           <TempEr
-            currentBalance={balance?.total_account_value || 0}  // pass number, not object
-            setCurrentBalance={setBalance}
+            currentBalance={balance} // full object
+            setCurrentBalance={setBalance} // full object
             onPercentChange={setLatestPercentChange}
           />
 
           <AsteroidGame
-            balance={balance}
-            setBalance={setBalance}
+            balance={balance} // full object
+            setBalance={setBalance} // full object
             latestPercentChange={latestPercentChange}
             hatPowerUp={accessorizeClicked}
             dragPowerUp={dragClicked}

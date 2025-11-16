@@ -4,7 +4,7 @@ import dino from "./assets/dino.png";
 import asteroidImg from "./assets/asteroid.png";
 import hat from "./assets/halloweenhatpowerup.png";
 import "./AsteroidGame.css";
-import { getBalance, getPortfolio } from "./api/getInfo";
+import { getBalance } from "./api/getInfo";
 
 export default function AsteroidGame({
   balance,              // shared balance
@@ -137,22 +137,7 @@ export default function AsteroidGame({
           <div className="asteroid-game-over">💥 Game Over! 💥</div>
         )}
       </div>
-      {balanceData && (
-        <div className="balance-info">
-          <p>Cash: ${balanceData.cash_balance}</p>
-          <p>Portfolio Value: ${balanceData.portfolio_value}</p>
-          <p>Total Account: ${balanceData.total_account_value}</p>
 
-          <h4>Your Stocks:</h4>
-          <ul>
-            {balanceData.portfolio.map((stock) => (
-              <li key={stock.ticker}>
-                {stock.ticker}: {stock.shares} shares | Current Value: ${stock.current_value} | Gain/Loss: ${stock.gain_loss}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }
