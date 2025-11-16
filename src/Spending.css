@@ -1,148 +1,97 @@
-/* Wrapper for title + content */
-.spending-page-wrapper {
-    display: flex;
-    flex-direction: column;   /* stack title and row */
-    align-items: center;      /* center horizontally */
-    margin-top: 20px;
-  }
-  
-  /* Title centered at top */
-  .spending-title {
-    font-size: 32px;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  /* Row container for calculator + powerups */
-  .spending-page {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 30px;
-  }
-  
-  /* Calculator container */
-  .calculator-container {
-    position: relative;
-    width: 300px;
-    height: 400px;
-  }
-  
-  .calculator-img {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-  
-  .calculator-display {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 5px;
-    border-radius: 5px;
-    text-align: right;
-    font-size: 18px;
-  }
-  
-  /* Buttons overlayed on calculator */
-  .calc-btn {
-    position: absolute;
-    width: 46px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid #333;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    text-align: center;
-    line-height: 40px;
-  }
-  
-  /* Powerups container */
-  .powerups-container {
-    height: 400px;
-  }
-  
-  .powerups-img {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-/* Wrapper for title + content */
-.spending-page-wrapper {
-  display: flex;
-  flex-direction: column;   /* stack title and row */
-  align-items: center;      /* center horizontally */
-  margin-top: 20px;
+/* --- WRAPPER --- */
+.spending-wrapper {
+  text-align: center;
+  padding: 2%;
+  font-family: "Georgia", serif;
 }
 
-/* Title centered at top */
 .spending-title {
-  font-size: 32px;
-  margin-bottom: 20px;
-  text-align: center;
+  margin-bottom: 2%;
 }
 
-/* Row container for calculator + powerups */
-.spending-page {
+/* --- CARD LAYOUT --- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.5%;
+  max-width: 75%;
+  margin: 0 auto;
+}
+
+/* --- CARD --- */
+.card {
+  background: #f8c7e0; /* pink */
+  padding: 2.5%;
+  border-radius: 25px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  text-align: left;
+}
+
+/* --- TITLE --- */
+.card .title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #301500;
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 30px;
+  align-items: center;
+  gap: 1%;
 }
 
-/* Calculator container */
-.calculator-container {
-  position: relative;
-  width: 300px;
-  height: 400px;
+/* --- SUBTITLE --- */
+.card .subtitle {
+  margin-top: 0.5%;
+  font-size: 1rem;
+  font-style: italic;
+  color: #3a2a24;
 }
 
-.calculator-img {
-  width: 100%;
-  height: 100%;
-  display: block;
+/* --- BUTTON ROW --- */
+.buttons {
+  margin-top: 2%;
+  display: flex;
+  gap: 1.2%;
 }
 
-.calculator-display {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 5px;
-  border-radius: 5px;
-  text-align: right;
-  font-size: 18px;
+/* --- PRICE BUTTON --- */
+.price {
+  background: #d9e4c6; /* pale green */
+  border: none;
+  padding: 1% 2.2%;
+  border-radius: 6px;
+  font-size: 1.125rem;
+  color: #2f3a1f;
 }
 
-/* Buttons overlayed on calculator */
-.calc-btn {
-  position: absolute;
-  width: 46px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid #333;
-  border-radius: 5px;
+/* --- PURCHASE BUTTON --- */
+.purchase {
+  background: #2e481f; /* dark forest green */
+  color: white;
+  border: none;
+  padding: 1% 2.6%;
+  border-radius: 6px;
+  font-size: 1.125rem;
   cursor: pointer;
-  font-size: 16px;
-  text-align: center;
-  line-height: 40px;
 }
 
-/* Powerups container */
-.powerups-container {
-  height: 400px;
+.purchase:hover {
+  background: #213615;
 }
 
-.powerups-img {
-  width: 100%;
-  height: 100%;
-  display: block;
+.purchase:disabled {
+  background: #9da399;
+}
+
+.balance-box {
+  position: absolute;
+  top: 16%;
+  right: 2%;
+
+  background: #d9e4c6;      /* light green */
+  padding: 1.2% 2%;
+  border-radius: 10px;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #2f3a1f;
+  font-family: "Georgia", serif;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
