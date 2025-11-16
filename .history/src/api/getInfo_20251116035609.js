@@ -16,11 +16,8 @@ export async function getBalance() {
   const res = await fetch("http://127.0.0.1:8000/balance");
   if (!res.ok) throw new Error("Network response was not ok");
   const data = await res.json();
-  // Return the full balance object with all details
-  return data;
+  return data.total_balance ?? 0;
 }
-
-
 
 export async function buyStock(ticker, amount, sharesOrMoney, priceOfShare) {
   let payload = amount;
@@ -43,6 +40,6 @@ export async function nextDay() {
 }
 
 export async function delAmt(val) {
-  const res = await fetch(`http://127.0.0.1:8000/del_amt/${val}`);
+  const res = await fetch("http://127.0.0.1:8000/del_amt/" + val);
   return await res.json();
 }

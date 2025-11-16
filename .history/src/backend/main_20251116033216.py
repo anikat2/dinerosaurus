@@ -10,7 +10,6 @@ import firebase_admin
 from firebase_admin import credentials, db
 import json
 import numpy as np
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 app.add_middleware(
@@ -30,7 +29,6 @@ VALID_TICKERS = [
 CACHE_FILE = "stock_cache.pkl"
 CACHE_MAX_AGE = timedelta(hours=24)
 REQUIRED_FUTURE_DAYS = 10
-STARTING_BALANCE = 100000.0  # Starting balance of $100,000
 
 historical_data = {}
 aligned_data = None
@@ -95,17 +93,13 @@ def startup_event():
         firebase_admin.get_app()
         print("Firebase already initialized")
     except ValueError:
-        cred = credentials.Certificate("serviceAccountKey.json")
+        service_account_info = json.loads(os.environ["GOOGLE_CREDS"])
         firebase_admin.initialize_app(cred, {
-            "databaseURL": "https://technica-842fc-default-rtdb.firebaseio.com/"
+            'databaseURL': 'https://technica-842fc-default-rtdb.firebaseio.com/'
         })
         print("Firebase initialized")
     
     db.reference('/stocks').delete()
-    
-    # Initialize balance
-    balance_ref = db.reference('/balance')
-    balance_ref.set({'amount': STARTING_BALANCE})
 
     load_historical_data()
 
@@ -255,17 +249,6 @@ async def top_stocks():
 async def add_stock(ticker: str, amount: float):
     global current_position
     
-    # Check if user has sufficient balance
-    balance_ref = db.reference('/balance')
-    balance_data = balance_ref.get()
-    current_balance = balance_data.get('amount', 0) if balance_data else 0
-    
-    if current_balance < amount:
-        return {
-            "status": "error", 
-            "message": f"Insufficient balance. Available: ${current_balance:.2f}, Required: ${amount:.2f}"
-        }
-    
     available_tickers = get_available_tickers()
     
     if ticker not in available_tickers:
@@ -284,10 +267,6 @@ async def add_stock(ticker: str, amount: float):
             if stock.get("ticker") == ticker:
                 existing_key = key
                 break
-    
-    # Deduct amount from balance
-    new_balance = current_balance - amount
-    balance_ref.set({'amount': new_balance})
     
     if existing_key:
         existing_stock = all_stocks[existing_key]
@@ -310,8 +289,7 @@ async def add_stock(ticker: str, amount: float):
             "new_shares": round(new_shares, 6),
             "total_shares": round(total_shares, 6),
             "invested_now": amount,
-            "total_invested": total_investment,
-            "remaining_balance": round(new_balance, 2)
+            "total_invested": total_investment
         }
     else:
         new_stock_ref = ref.push()
@@ -328,95 +306,7 @@ async def add_stock(ticker: str, amount: float):
             "ticker": ticker,
             "current_price": current_price,
             "shares": round(new_shares, 6),
-            "invested": amount,
-            "remaining_balance": round(new_balance, 2)
-        }
-
-@app.get("/sell_stock/{ticker}/{amount}")
-async def sell_stock(ticker: str, amount: float):
-    """Sell a specified dollar amount of a stock"""
-    if amount <= 0:
-        return {"status": "error", "message": "Amount must be positive"}
-    
-    ref = db.reference('/stocks')
-    all_stocks = ref.get()
-    
-    if not all_stocks:
-        return {"status": "error", "message": "No stocks in portfolio"}
-    
-    # Find the stock
-    stock_key = None
-    stock_data = None
-    for key, stock in all_stocks.items():
-        if stock.get("ticker") == ticker:
-            stock_key = key
-            stock_data = stock
-            break
-    
-    if not stock_key:
-        return {"status": "error", "message": f"Ticker {ticker} not found in portfolio"}
-    
-    current_price = stock_data.get("price", 0)
-    current_shares = stock_data.get("shares", 0)
-    initial_investment = stock_data.get("initial_investment", 0)
-    
-    if current_price <= 0:
-        return {"status": "error", "message": "Invalid stock price"}
-    
-    # Calculate current value and shares to sell
-    current_value = current_shares * current_price
-    
-    if amount > current_value:
-        return {
-            "status": "error", 
-            "message": f"Insufficient shares. Current value: ${current_value:.2f}, Requested: ${amount:.2f}"
-        }
-    
-    shares_to_sell = amount / current_price
-    remaining_shares = current_shares - shares_to_sell
-    
-    # Calculate proportional investment reduction
-    investment_reduction = (shares_to_sell / current_shares) * initial_investment
-    remaining_investment = initial_investment - investment_reduction
-    
-    # Add amount to balance
-    balance_ref = db.reference('/balance')
-    balance_data = balance_ref.get()
-    current_balance = balance_data.get('amount', 0) if balance_data else 0
-    new_balance = current_balance + amount
-    balance_ref.set({'amount': new_balance})
-    
-    # Update or delete stock position
-    if remaining_shares < 0.000001:  # Essentially zero shares
-        ref.child(stock_key).delete()
-        return {
-            "status": "success",
-            "action": "sold_all",
-            "ticker": ticker,
-            "sold_shares": round(current_shares, 6),
-            "sale_price": current_price,
-            "sale_amount": round(amount, 2),
-            "new_balance": round(new_balance, 2),
-            "profit_loss": round(amount - initial_investment, 2)
-        }
-    else:
-        ref.child(stock_key).update({
-            'shares': remaining_shares,
-            'initial_investment': remaining_investment
-        })
-        
-        profit_loss = amount - investment_reduction
-        
-        return {
-            "status": "success",
-            "action": "partial_sale",
-            "ticker": ticker,
-            "sold_shares": round(shares_to_sell, 6),
-            "remaining_shares": round(remaining_shares, 6),
-            "sale_price": current_price,
-            "sale_amount": round(amount, 2),
-            "new_balance": round(new_balance, 2),
-            "profit_loss": round(profit_loss, 2)
+            "invested": amount
         }
 
 @app.get("/next_day")
@@ -544,78 +434,4 @@ async def status():
         "total_days": len(aligned_data),
         "days_remaining": len(aligned_data) - current_position,
         "available_tickers": available_tickers
-    }
-
-@app.get("/balance")
-async def get_balance():
-    """Get the current balance and portfolio summary"""
-    balance_ref = db.reference('/balance')
-    balance_data = balance_ref.get()
-    current_balance = balance_data.get('amount', 0) if balance_data else 0
-    
-    # Calculate portfolio value
-    stocks_ref = db.reference('/stocks')
-    all_stocks = stocks_ref.get()
-    
-    total_invested = 0
-    total_current_value = 0
-    portfolio = []
-    
-    if all_stocks:
-        for key, stock in all_stocks.items():
-            ticker = stock.get("ticker")
-            shares = stock.get("shares", 0)
-            initial_investment = stock.get("initial_investment", 0)
-            current_price = stock.get("price", 0)
-            
-            current_value = shares * current_price
-            total_invested += initial_investment
-            total_current_value += current_value
-            
-            portfolio.append({
-                "ticker": ticker,
-                "shares": round(shares, 6),
-                "initial_investment": round(initial_investment, 2),
-                "current_value": round(current_value, 2),
-                "gain_loss": round(current_value - initial_investment, 2)
-            })
-    
-    total_portfolio_value = current_balance + total_current_value
-    total_gain_loss = total_current_value - total_invested
-    
-    return {
-        "cash_balance": round(current_balance, 2),
-        "invested_amount": round(total_invested, 2),
-        "portfolio_value": round(total_current_value, 2),
-        "total_account_value": round(total_portfolio_value, 2),
-        "total_gain_loss": round(total_gain_loss, 2),
-        "starting_balance": STARTING_BALANCE,
-        "portfolio": portfolio
-    }
-
-@app.get("/del_amt/{amount}")
-async def del_amt(amount: float):
-    """Deduct an amount from the cash balance"""
-    if amount <= 0:
-        return {"status": "error", "message": "Amount must be positive"}
-    
-    # Get current balance
-    balance_ref = db.reference('/balance')
-    balance_data = balance_ref.get()
-    current_balance = balance_data.get('amount', 0) if balance_data else 0
-    
-    if current_balance < amount:
-        return {
-            "status": "error",
-            "message": f"Insufficient balance. Available: ${current_balance:.2f}, Required: ${amount:.2f}"
-        }
-    
-    # Deduct amount
-    new_balance = current_balance - amount
-    balance_ref.set({'amount': new_balance})
-    
-    return {
-        "status": "success",
-        "new_balance": round(new_balance, 2),
-        "deducted": amount
     }

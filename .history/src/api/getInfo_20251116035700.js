@@ -43,6 +43,6 @@ export async function nextDay() {
 }
 
 export async function delAmt(val) {
-  const res = await fetch(`http://127.0.0.1:8000/del_amt/${val}`);
+  const res = await fetch("http://127.0.0.1:8000/del_amt/" + val);
   return await res.json();
 }

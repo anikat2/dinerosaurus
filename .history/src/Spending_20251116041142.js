@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import calculatorImg from "./assets/calculator.png";
 import powerupsImg from "./assets/powerups.png";
 import "./Spending.css";
@@ -18,20 +18,6 @@ function Spending({
   setTimeTravelClicked
 }) {
   const [input, setInput] = useState("");
-
-  // Fetch balance on mount
-  useEffect(() => {
-    const fetchBalanceData = async () => {
-      try {
-        const balanceData = await getBalance();
-        setBalance(balanceData);
-      } catch (error) {
-        console.error("Error fetching balance:", error);
-      }
-    };
-    
-    fetchBalanceData();
-  }, [setBalance]);
 
   // Get current cash balance from balance object
   const currentBalance = balance?.cash_balance || 0;

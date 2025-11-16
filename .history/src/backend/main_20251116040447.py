@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI
 import random
 import pandas as pd
@@ -330,93 +331,6 @@ async def add_stock(ticker: str, amount: float):
             "shares": round(new_shares, 6),
             "invested": amount,
             "remaining_balance": round(new_balance, 2)
-        }
-
-@app.get("/sell_stock/{ticker}/{amount}")
-async def sell_stock(ticker: str, amount: float):
-    """Sell a specified dollar amount of a stock"""
-    if amount <= 0:
-        return {"status": "error", "message": "Amount must be positive"}
-    
-    ref = db.reference('/stocks')
-    all_stocks = ref.get()
-    
-    if not all_stocks:
-        return {"status": "error", "message": "No stocks in portfolio"}
-    
-    # Find the stock
-    stock_key = None
-    stock_data = None
-    for key, stock in all_stocks.items():
-        if stock.get("ticker") == ticker:
-            stock_key = key
-            stock_data = stock
-            break
-    
-    if not stock_key:
-        return {"status": "error", "message": f"Ticker {ticker} not found in portfolio"}
-    
-    current_price = stock_data.get("price", 0)
-    current_shares = stock_data.get("shares", 0)
-    initial_investment = stock_data.get("initial_investment", 0)
-    
-    if current_price <= 0:
-        return {"status": "error", "message": "Invalid stock price"}
-    
-    # Calculate current value and shares to sell
-    current_value = current_shares * current_price
-    
-    if amount > current_value:
-        return {
-            "status": "error", 
-            "message": f"Insufficient shares. Current value: ${current_value:.2f}, Requested: ${amount:.2f}"
-        }
-    
-    shares_to_sell = amount / current_price
-    remaining_shares = current_shares - shares_to_sell
-    
-    # Calculate proportional investment reduction
-    investment_reduction = (shares_to_sell / current_shares) * initial_investment
-    remaining_investment = initial_investment - investment_reduction
-    
-    # Add amount to balance
-    balance_ref = db.reference('/balance')
-    balance_data = balance_ref.get()
-    current_balance = balance_data.get('amount', 0) if balance_data else 0
-    new_balance = current_balance + amount
-    balance_ref.set({'amount': new_balance})
-    
-    # Update or delete stock position
-    if remaining_shares < 0.000001:  # Essentially zero shares
-        ref.child(stock_key).delete()
-        return {
-            "status": "success",
-            "action": "sold_all",
-            "ticker": ticker,
-            "sold_shares": round(current_shares, 6),
-            "sale_price": current_price,
-            "sale_amount": round(amount, 2),
-            "new_balance": round(new_balance, 2),
-            "profit_loss": round(amount - initial_investment, 2)
-        }
-    else:
-        ref.child(stock_key).update({
-            'shares': remaining_shares,
-            'initial_investment': remaining_investment
-        })
-        
-        profit_loss = amount - investment_reduction
-        
-        return {
-            "status": "success",
-            "action": "partial_sale",
-            "ticker": ticker,
-            "sold_shares": round(shares_to_sell, 6),
-            "remaining_shares": round(remaining_shares, 6),
-            "sale_price": current_price,
-            "sale_amount": round(amount, 2),
-            "new_balance": round(new_balance, 2),
-            "profit_loss": round(profit_loss, 2)
         }
 
 @app.get("/next_day")
